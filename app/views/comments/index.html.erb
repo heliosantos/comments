@@ -1,0 +1,24 @@
+<% @root_comments.each{ |c| c.level = 0} %>
+
+
+<% while @root_comments.size > 0 %>
+  <% comment = @root_comments[0] %>
+
+  <% puts comment.present? %>
+  <% @root_comments.delete_at(0) %>
+  <% replies = comment.get_replies %>
+  <% replies.each{ |r| r.level = comment.level + 1} %>
+  <% @root_comments = replies + @root_comments %>
+
+  <div class="comment" style=<%= "margin-left:#{(comment.level * 50)}px;" %> >
+    <%= comment.text %>
+
+    <%= simple_form_for @new_comment, url: {controller: :comments, action: :reply} do |f| %>
+      <%= f.input :text, as: :text, label: false, wrapper: false, input_html: {rows: 3, cols: 65} %>
+      <%= f.input :parent_id, as: 'hidden', input_html: {value: comment.to_param} %>
+      <%= f.submit 'reply' %>
+    <% end %>
+
+  </div>
+
+<% end %>
